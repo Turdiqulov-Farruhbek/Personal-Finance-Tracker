@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service AuthService {
+    rpc Register(UserCreateReq) returns (Void) ;
+    rpc Login(LoginReq) returns (Token) ;
+    rpc RefreshToken(Token) returns (Token) ;
+    rpc UpdateProfile(UserUpdate) returns (Void) ;
+    rpc GetUserProfile(ById) returns (UserCreateRes) ;
+    rpc ChangePassword(PasswordChangeReq) returns (Void) ;
+    rpc ForgotPassword(ForgotPasswordReq) returns (Void) ;
+    rpc ResetPassword(PasswordResetReq) returns (Void) ;
+    rpc ConfirmEmail(EmailConfirm) returns (Void);
+    rpc ResendCode(ResendReq) returns (Void);
+    rpc GetAllUsers(UserFilter) returns (UserList);
+}
+
+message User {
+    string Id = 1;
+    string UserName = 2;
+    string Email = 3;
+    string Password = 4;
+    string FullName = 5;
+    string Dob = 6;
+    string Language = 7;
+    string CreatedAt = 8;
+    string UpdatedAt = 9;
+    int32  DeletedAt = 10;
+}
+message UserCreateReq {
+    string UserName = 1;
+    string Email = 2;
+    string Password = 3;
+    string FullName = 4;
+    string Dob = 5;
+}
+message UserCreateRes {
+    string Id = 1;
+    string UserName = 2;
+    string Email = 3;
+    string FullName = 4;
+    string Dob = 5;
+    string CreatedAt = 6;
+}
+message LoginReq {
+    string UserName = 1;
+    string Password = 2;
+}
+message Token {
+    string AccessToken = 1;
+    string ExpiresAt = 2;
+}
+message LogoutReq {
+    string AccessToken = 1;
+}
+message UserUpdateModel {
+    string FullName = 1;
+    string Dob = 2;
+    string Language = 3;
+}
+message UserUpdate {
+    string Id = 1;
+    UserUpdateModel Body = 2;
+}
+message PasswordChangeBody {
+    string OldPassword = 1;
+    string NewPassword = 2; 
+}
+message PasswordChangeReq {
+    string UserId = 1;
+    PasswordChangeBody Body = 2;
+}
+message EmailBody {
+    string Email = 1;
+}
+message ForgotPasswordReq {
+    string UserId = 1;
+    EmailBody Body = 2;
+}
+message ResetBody {
+    string ResetCode = 1;
+    string NewPassword = 2;
+}
+message PasswordResetReq {
+    string UserId =1;
+    ResetBody Body = 2;
+}
+message EmailConfirm {
+    string Email = 1;
+    string Code = 2;
+}
+message ResendReq {
+    string Email =1;
+}
+message UserFilter {
+    string Role = 1;
+    string IsWorking = 2;
+    Filter Filter = 3;
+}
+message UserList {
+    repeated UserCreateRes Users = 1;
+    int32 Count = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}
+

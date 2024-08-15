@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service CategoryService {
+    rpc CreateCategory(CategoryCreate) returns (Void);
+    rpc UpdateCategory(CategoryUpdate) returns (Void);
+    rpc DeleteCategory(ById) returns (Void);
+    rpc ListCategories(CategoryFilter) returns (CategoryList);
+    rpc GetCategory(ById) returns (CategoryGet);
+}
+
+message CategoryCreate {
+    string UserId = 1;
+    string Name = 2;
+    string Type = 3;
+}
+message CategoryUpdate {
+    string Id = 1;
+    CategoryCreate Category = 2;
+}
+message CategoryGet {
+    string Id = 1;
+    string UserId = 2;
+    string Name = 3;
+    string Type = 4;
+    string CreatedAt = 5;
+    string UpdatedAt = 6;
+}
+message CategoryFilter  {
+    string UserId = 1;
+    string Name = 2;
+    string Type = 3;
+    Filter Filter = 4;
+}
+message CategoryList {
+    repeated CategoryGet Get = 1;
+    int32 Total = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}

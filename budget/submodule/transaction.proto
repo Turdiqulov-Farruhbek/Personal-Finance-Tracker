@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service TransactionService {
+    rpc CreateTransaction(TransactionCreate) returns (Void);
+    rpc GetTransaction(ById) returns (TransactionGet);
+    rpc UpdateTransaction(TransactionUpdate) returns (Void);
+    rpc DeleteTransaction(ById) returns (Void);
+    rpc ListTransactions(TransactionFilter) returns (TransactionList);
+} 
+message TransactionCreate {
+    string UserId = 1;
+    string AccountId = 2;
+    string CategoryId = 3;
+    float  Amount = 4;
+    string Type = 5;
+    string Description = 6;
+}
+message TransactionGet {
+    string Id = 1;
+    string UserId = 2;
+    string AccountId = 3;
+    string CategoryId = 4;
+    float Amount = 5;
+    string Type = 6;
+    string Description = 7;
+    string Time = 8;
+}
+message TransactionUpt {
+    string AccountId = 1;
+    string CategoryId = 2;
+    float  Amount = 3;
+    string Type = 4;
+    string Description = 5;
+}
+message TransactionUpdate {
+    string Id = 1;
+    TransactionUpt Body = 2;
+}
+message TransactionFilter  {
+    string UserId = 1;
+    string AccountId = 2;
+    string CategoryId = 3;
+    string Type = 4;
+    string Description = 5;
+    string TimeFrom = 6;
+    string TimeTo = 7;
+    float  AmountFrom = 8;
+    float  AmountTo = 9;
+    Filter Filter = 10;
+}
+message TransactionList {
+    repeated TransactionGet TransactionGet = 1;
+    int32 TotalCount = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}

@@ -1,0 +1,60 @@
+    syntax = "proto3";
+
+    option go_package = "/internal/pkg/genproto";
+
+    package submodule;
+
+    import "common.proto";
+
+service GoalService {
+    rpc CreateGoal(GoalCreate) returns (Void);
+    rpc UpdateGoal(GoalUpdate) returns (Void);
+    rpc DeleteGoal(ById) returns (Void);
+    rpc ListGoals(GoalFilter) returns (GoalList);
+    rpc GetGoal(ById) returns (GoalGet);
+}
+message GoalCreate{
+    string UserId = 1;
+    string Name = 2;
+    float  TargetAmount = 3;
+    float  CurrentAmount = 4;
+    string Deadline = 5;
+}
+message GoalUpt {
+    string Name = 1;
+    float TargetAmount = 2;
+    float CurrentAmount = 3;
+    string Deadline = 4;
+    string Status = 5;
+}
+message GoalUpdate {
+    string Id = 1;
+    GoalUpt Body = 2;
+}
+message GoalGet {
+    string Id = 1;
+    string UserId = 2;
+    string Name = 3;
+    float  TargetAmount = 4;
+    float  CurrentAmount = 5;
+    string Deadline = 6;
+    string Status = 7;
+    string CreatedAt = 8;
+    string UpdatedAt = 9;
+}
+message GoalFilter {
+    string UserId = 1;
+    string Status = 2;
+    string Name = 3;
+    float  TargetFrom = 4;
+    float  TargetTo = 5;
+    string DeadlineFrom = 6;
+    string DeadlineTo = 7;
+    Filter Filter = 8;
+}
+message GoalList {
+    repeated GoalGet Goals = 1;
+    int32 TotalCount = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}

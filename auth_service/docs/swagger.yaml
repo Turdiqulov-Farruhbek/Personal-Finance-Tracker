@@ -1,0 +1,382 @@
+basePath: /
+definitions:
+  genproto.EmailBody:
+    properties:
+      Email:
+        type: string
+    type: object
+  genproto.EmailConfirm:
+    properties:
+      Code:
+        type: string
+      Email:
+        type: string
+    type: object
+  genproto.LoginReq:
+    properties:
+      Password:
+        type: string
+      UserName:
+        type: string
+    type: object
+  genproto.PasswordChangeBody:
+    properties:
+      NewPassword:
+        type: string
+      OldPassword:
+        type: string
+    type: object
+  genproto.ResendReq:
+    properties:
+      Email:
+        type: string
+    type: object
+  genproto.ResetBody:
+    properties:
+      NewPassword:
+        type: string
+      ResetCode:
+        type: string
+    type: object
+  genproto.Token:
+    properties:
+      AccessToken:
+        type: string
+      ExpiresAt:
+        type: string
+    type: object
+  genproto.UserCreateReq:
+    properties:
+      Dob:
+        type: string
+      Email:
+        type: string
+      FullName:
+        type: string
+      Password:
+        type: string
+      UserName:
+        type: string
+    type: object
+  genproto.UserCreateRes:
+    properties:
+      CreatedAt:
+        type: string
+      Dob:
+        type: string
+      Email:
+        type: string
+      FullName:
+        type: string
+      Id:
+        type: string
+      UserName:
+        type: string
+    type: object
+  genproto.UserUpdateModel:
+    properties:
+      Dob:
+        type: string
+      FullName:
+        type: string
+      Language:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Finance Tarcker Auth service API Documentation
+paths:
+  /user/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Confirm Email
+      parameters:
+      - description: Email Confirm data
+        in: body
+        name: Email
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.EmailConfirm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/genproto.EmailConfirm'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: ConfirmEmail
+      tags:
+      - User
+  /user/forgot_password:
+    post:
+      consumes:
+      - application/json
+      description: Send a reset password code to the user's email
+      parameters:
+      - description: Email data
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.EmailBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reset password code sent successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Send a reset password code to the user's email
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Log in a user with the provided credentials
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/genproto.Token'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Log in a user
+      tags:
+      - User
+  /user/password:
+    put:
+      consumes:
+      - application/json
+      description: Change user password with the provided details
+      parameters:
+      - description: Password change data
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.PasswordChangeBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Change user password
+      tags:
+      - User
+  /user/profile:
+    get:
+      consumes:
+      - application/json
+      description: Gets user profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/genproto.UserCreateRes'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: GetUserProfile
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user profile with the provided details
+      parameters:
+      - description: Profile data
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.UserUpdateModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - User
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided details
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.UserCreateReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User registered successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Register a new user
+      tags:
+      - User
+  /user/resend:
+    post:
+      consumes:
+      - application/json
+      description: Resends Code
+      parameters:
+      - description: Email data
+        in: body
+        name: Email
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.ResendReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/genproto.ResendReq'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: ResendCode
+      tags:
+      - User
+  /user/reset_password:
+    post:
+      consumes:
+      - application/json
+      description: Reset user password with the provided reset code and new password
+      parameters:
+      - description: Reset code data
+        in: body
+        name: resetCode
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.ResetBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Reset user password
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

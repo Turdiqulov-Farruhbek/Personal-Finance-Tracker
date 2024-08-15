@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+
+message Void {}
+
+message ById {
+    string Id = 1;
+}
+message Filter {
+    int32 Limit = 1;
+    int32 Offset = 2;
+}

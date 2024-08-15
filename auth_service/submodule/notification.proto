@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service NotificationService {
+    rpc CreateNotification(NotificationCreate) returns (Void);
+    rpc DeleteNotification(ById) returns (Void);
+    rpc UpdateNotification(NotificationUpdate) returns (Void);
+    rpc GetNotifications(NotifFilter) returns (NotificationList);
+    rpc GetNotification(ById) returns (NotificationGet);
+    rpc NotifyAll(NotificationMessage) returns(Void);
+}
+message NotificationCreate {
+    string RecieverId = 1;
+    string Message = 2;
+    string SenderId = 3;
+}
+message NotificationUpt {
+    string Message = 1;
+    string Status = 2;
+}
+message NotificationUpdate {
+    string NotificationId = 1;
+    NotificationUpt Body = 2;
+}
+
+message NotificationGet {
+    string Id = 1;
+    string UserId = 2;
+    string Message = 3;
+    string Status = 4;
+    string CreatedAt = 5;
+    string SenderId = 6;
+}
+
+message NotifFilter {
+    string RecieverId = 1;
+    string Status = 2;
+    string SenderId = 3;
+    Filter Filter = 4;
+}
+
+message NotificationList {
+    repeated NotificationGet Notifications = 1;
+    int64 TotalCount = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}
+message NotificationMessage {
+    string Message = 1;
+    string TargetGroup = 2;
+    string SenderId = 3;
+}

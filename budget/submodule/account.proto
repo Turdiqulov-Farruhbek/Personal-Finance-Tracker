@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service AccountService {
+    rpc CreateAccount(AccountCreate) returns (Void);
+    rpc GetAccount(ById) returns (AccountGet);
+    rpc UpdateAccount(AccountUpdate) returns (Void);
+    rpc DeleteAccount(ById) returns (Void);
+    rpc ListAccounts(AccountFilter) returns (AccounList);
+}
+message AccountCreate{
+    string UserId = 1;
+    string Name = 2;
+    string Type = 3;
+    string Currency = 4;
+}
+message AccountGet {
+    string Id = 1;
+    string UserId = 2;
+    string name = 3;
+    string type = 4;
+    string currency = 5;
+    float  balance = 6;
+    string CreatedAt = 7;
+    string UpdatedAt = 8;
+}
+
+message AccountUpt {
+    string name = 1;
+    string type = 2;
+    string currency = 3;
+    float  balance = 4;
+}
+message AccountUpdate {
+    string Id = 1;
+    AccountUpt Body = 2;
+}
+message AccountFilter {
+    string Name = 1;
+    string Type = 2;
+    string Currency = 3;
+    float  BalanceMin = 4;
+    float  BalanceMax = 5;
+    Filter Filter = 6;
+    string UserId = 7;
+}
+message AccounList {
+    repeated AccountGet Accounts = 1;
+    int32 TotalCount = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}

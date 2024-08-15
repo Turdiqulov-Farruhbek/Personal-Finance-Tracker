@@ -1,0 +1,3 @@
+[submodule "submodule"]
+	path = submodule
+	url = git@gitlab.com:finance_tracker1/submodule.git

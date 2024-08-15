@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "common.proto";
+
+service BudgetService {
+    rpc CreateBudget(BudgetCreate) returns (Void);
+    rpc UpdateBudget(BudgetUpdate) returns (Void);
+    rpc DeleteBudget(ById) returns (Void);
+    rpc GetBudget(ById) returns (BudgetGet);
+    rpc ListBudgets(BudgetFilter) returns (BudgetList);    
+}
+message BudgetCreate {
+    string UserId = 1;
+    string CategoryId = 2;
+    float  Amount = 3;
+    string Period = 4;
+    string StartDate = 5;
+    string EndDate = 6;
+}
+message BudgetUpdate {
+    string Id = 1;
+    BudgetCreate Body = 2;
+}
+message BudgetGet {
+    string Id = 1;
+    string UserId = 2;
+    string CategoryId = 3;
+    float Amount = 4;
+    string Period = 5;
+    string StartDate = 6;
+    string EndDate = 7;
+}
+message BudgetFilter {
+    string UserId = 1;
+    string CategoryId = 2;
+    float AmountFrom = 3;
+    float AmountTo = 4;
+    string Period = 5;
+    Filter Filter = 6;
+    string Status = 7;
+}
+message BudgetList {
+    repeated BudgetGet Budgets = 1;
+    int32 TotalCount = 2;
+    int32 Limit = 3;
+    int32 Offset = 4;
+}
