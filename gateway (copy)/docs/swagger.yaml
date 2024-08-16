@@ -1,0 +1,1722 @@
+basePath: /
+definitions:
+  genproto.AccounList:
+    properties:
+      Accounts:
+        items:
+          $ref: '#/definitions/genproto.AccountGet'
+        type: array
+      Limit:
+        type: integer
+      Offset:
+        type: integer
+      TotalCount:
+        type: integer
+    type: object
+  genproto.AccountCreate:
+    properties:
+      Currency:
+        type: string
+      Name:
+        type: string
+      Type:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.AccountGet:
+    properties:
+      CreatedAt:
+        type: string
+      Id:
+        type: string
+      UpdatedAt:
+        type: string
+      UserId:
+        type: string
+      balance:
+        type: number
+      currency:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  genproto.AccountUpt:
+    properties:
+      balance:
+        type: number
+      currency:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  genproto.BudgetCreate:
+    properties:
+      Amount:
+        type: number
+      CategoryId:
+        type: string
+      EndDate:
+        type: string
+      Period:
+        type: string
+      StartDate:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.BudgetGet:
+    properties:
+      Amount:
+        type: number
+      CategoryId:
+        type: string
+      EndDate:
+        type: string
+      Id:
+        type: string
+      Period:
+        type: string
+      StartDate:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.BudgetList:
+    properties:
+      Budgets:
+        items:
+          $ref: '#/definitions/genproto.BudgetGet'
+        type: array
+      Limit:
+        type: integer
+      Offset:
+        type: integer
+      TotalCount:
+        type: integer
+    type: object
+  genproto.BudgetPerGet:
+    properties:
+      Performances:
+        items:
+          $ref: '#/definitions/genproto.PeriodBudgetPer'
+        type: array
+      UserId:
+        type: string
+    type: object
+  genproto.CategoryCreate:
+    properties:
+      Name:
+        type: string
+      Type:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.CategoryGet:
+    properties:
+      CreatedAt:
+        type: string
+      Id:
+        type: string
+      Name:
+        type: string
+      Type:
+        type: string
+      UpdatedAt:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.CategoryList:
+    properties:
+      Get:
+        items:
+          $ref: '#/definitions/genproto.CategoryGet'
+        type: array
+      Limit:
+        type: integer
+      Offset:
+        type: integer
+      Total:
+        type: integer
+    type: object
+  genproto.GoalCreate:
+    properties:
+      CurrentAmount:
+        type: number
+      Deadline:
+        type: string
+      Name:
+        type: string
+      TargetAmount:
+        type: number
+      UserId:
+        type: string
+    type: object
+  genproto.GoalGet:
+    properties:
+      CreatedAt:
+        type: string
+      CurrentAmount:
+        type: number
+      Deadline:
+        type: string
+      Id:
+        type: string
+      Name:
+        type: string
+      Status:
+        type: string
+      TargetAmount:
+        type: number
+      UpdatedAt:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.GoalList:
+    properties:
+      Goals:
+        items:
+          $ref: '#/definitions/genproto.GoalGet'
+        type: array
+      Limit:
+        type: integer
+      Offset:
+        type: integer
+      TotalCount:
+        type: integer
+    type: object
+  genproto.GoalProgresGet:
+    properties:
+      Goals:
+        items:
+          $ref: '#/definitions/genproto.GoalProgress'
+        type: array
+      UserId:
+        type: string
+    type: object
+  genproto.GoalProgress:
+    properties:
+      CurrentAmount:
+        type: number
+      Deadline:
+        type: string
+      GoalName:
+        type: string
+      Progress:
+        type: string
+      TargetAmount:
+        type: number
+    type: object
+  genproto.GoalUpt:
+    properties:
+      CurrentAmount:
+        type: number
+      Deadline:
+        type: string
+      Name:
+        type: string
+      Status:
+        type: string
+      TargetAmount:
+        type: number
+    type: object
+  genproto.IncomeGet:
+    properties:
+      CategoryId:
+        type: string
+      DateFrom:
+        type: string
+      DateTo:
+        type: string
+      TotalAmount:
+        type: number
+      UserId:
+        type: string
+    type: object
+  genproto.NotificationCreate:
+    properties:
+      Message:
+        type: string
+      RecieverId:
+        type: string
+      SenderId:
+        type: string
+    type: object
+  genproto.NotificationGet:
+    properties:
+      CreatedAt:
+        type: string
+      Id:
+        type: string
+      Message:
+        type: string
+      SenderId:
+        type: string
+      Status:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.NotificationList:
+    properties:
+      Limit:
+        type: integer
+      Notifications:
+        items:
+          $ref: '#/definitions/genproto.NotificationGet'
+        type: array
+      Offset:
+        type: integer
+      TotalCount:
+        type: integer
+    type: object
+  genproto.NotificationMessage:
+    properties:
+      Message:
+        type: string
+      SenderId:
+        type: string
+      TargetGroup:
+        type: string
+    type: object
+  genproto.NotificationUpt:
+    properties:
+      Message:
+        type: string
+      Status:
+        type: string
+    type: object
+  genproto.PeriodBudgetPer:
+    properties:
+      AvgSpendings:
+        type: number
+      EndDate:
+        type: string
+      Period:
+        type: string
+      Progress:
+        type: string
+      StartDate:
+        type: string
+      TargetAmount:
+        type: number
+    type: object
+  genproto.SpendingGet:
+    properties:
+      CategoryId:
+        type: string
+      DateFrom:
+        type: string
+      DateTo:
+        type: string
+      ToatalAmount:
+        type: number
+      Transactions:
+        items:
+          $ref: '#/definitions/genproto.TransactionGet'
+        type: array
+      Userid:
+        type: string
+    type: object
+  genproto.TransactionCreate:
+    properties:
+      AccountId:
+        type: string
+      Amount:
+        type: number
+      CategoryId:
+        type: string
+      Description:
+        type: string
+      Type:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.TransactionGet:
+    properties:
+      AccountId:
+        type: string
+      Amount:
+        type: number
+      CategoryId:
+        type: string
+      Description:
+        type: string
+      Id:
+        type: string
+      Time:
+        type: string
+      Type:
+        type: string
+      UserId:
+        type: string
+    type: object
+  genproto.TransactionList:
+    properties:
+      Limit:
+        type: integer
+      Offset:
+        type: integer
+      TotalCount:
+        type: integer
+      TransactionGet:
+        items:
+          $ref: '#/definitions/genproto.TransactionGet'
+        type: array
+    type: object
+info:
+  contact: {}
+  description: API for Instant Delivery resources
+  title: Finance Tracker API Documentation
+  version: "1.0"
+paths:
+  /account/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get an account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account data
+          schema:
+            $ref: '#/definitions/genproto.AccountGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Account not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Account
+      tags:
+      - Account
+  /account/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new account
+      parameters:
+      - description: Account data
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.AccountCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Account
+      tags:
+      - Account
+  /account/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Account
+      tags:
+      - Account
+  /account/list:
+    get:
+      consumes:
+      - application/json
+      description: List accounts with filters
+      parameters:
+      - description: Account Name
+        in: query
+        name: name
+        type: string
+      - description: Account Type
+        in: query
+        name: type
+        type: string
+      - description: Currency
+        in: query
+        name: currency
+        type: string
+      - description: Minimum Balance
+        in: query
+        name: balanceMin
+        type: integer
+      - description: Maximum Balance
+        in: query
+        name: balanceMax
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: User ID
+        in: query
+        name: userId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of accounts
+          schema:
+            $ref: '#/definitions/genproto.AccounList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List Accounts
+      tags:
+      - Account
+  /account/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing account by ID
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Account update data
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.AccountUpt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Account
+      tags:
+      - Account
+  /budgets/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a budget by its ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget details
+          schema:
+            $ref: '#/definitions/genproto.BudgetGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Budget not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Budget
+      tags:
+      - Budget
+    put:
+      consumes:
+      - application/json
+      description: Update an existing budget
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Budget data
+        in: body
+        name: budget
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.BudgetCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Budget
+      tags:
+      - Budget
+  /budgets/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new budget
+      parameters:
+      - description: Budget data
+        in: body
+        name: budget
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.BudgetCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Budget
+      tags:
+      - Budget
+  /budgets/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a budget by its ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Budget not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Budget
+      tags:
+      - Budget
+  /budgets/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of budgets
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: string
+      - description: Minimum Amount
+        in: query
+        name: amount_from
+        type: number
+      - description: Maximum Amount
+        in: query
+        name: amount_to
+        type: number
+      - description: Budget Period
+        in: query
+        name: period
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of budgets
+          schema:
+            $ref: '#/definitions/genproto.BudgetList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List Budgets
+      tags:
+      - Budget
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Category not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Category
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category details
+          schema:
+            $ref: '#/definitions/genproto.CategoryGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Category not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Category
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Update an existing category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.CategoryCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Category
+      tags:
+      - Category
+  /categories/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.CategoryCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Category
+      tags:
+      - Category
+  /categories/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of categories
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Category Name
+        in: query
+        name: name
+        type: string
+      - description: Category Type
+        in: query
+        name: type
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories
+          schema:
+            $ref: '#/definitions/genproto.CategoryList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List Categories
+      tags:
+      - Category
+  /goals/{goal_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a goal by its ID
+      parameters:
+      - description: Goal ID
+        in: path
+        name: goal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Goal not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Goal
+      tags:
+      - Goal
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a goal by its ID
+      parameters:
+      - description: Goal ID
+        in: path
+        name: goal_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal details
+          schema:
+            $ref: '#/definitions/genproto.GoalGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Goal not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Goal
+      tags:
+      - Goal
+    put:
+      consumes:
+      - application/json
+      description: Update an existing goal
+      parameters:
+      - description: Goal ID
+        in: path
+        name: goal_id
+        required: true
+        type: string
+      - description: Goal data
+        in: body
+        name: goal
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.GoalUpt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Goal
+      tags:
+      - Goal
+  /goals/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new goal
+      parameters:
+      - description: Goal data
+        in: body
+        name: goal
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.GoalCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Goal
+      tags:
+      - Goal
+  /goals/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of goals
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Goal Status
+        in: query
+        name: status
+        type: string
+      - description: Goal Name
+        in: query
+        name: name
+        type: string
+      - description: Target Amount From
+        in: query
+        name: target_from
+        type: number
+      - description: Target Amount To
+        in: query
+        name: target_to
+        type: number
+      - description: Deadline From
+        in: query
+        name: deadline_from
+        type: string
+      - description: Deadline To
+        in: query
+        name: deadline_to
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of goals
+          schema:
+            $ref: '#/definitions/genproto.GoalList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List Goals
+      tags:
+      - Goal
+  /notifications/{notification_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Notification not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete Notification
+      tags:
+      - Notification
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a notification by its ID
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification details
+          schema:
+            $ref: '#/definitions/genproto.NotificationGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "404":
+          description: Notification not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Notification
+      tags:
+      - Notification
+    put:
+      consumes:
+      - application/json
+      description: Update an existing notification
+      parameters:
+      - description: Notification ID
+        in: path
+        name: notification_id
+        required: true
+        type: string
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.NotificationUpt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Notification
+      tags:
+      - Notification
+  /notifications/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification
+      parameters:
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.NotificationCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create Notification
+      tags:
+      - Notification
+  /notifications/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of notifications
+      parameters:
+      - description: Receiver ID
+        in: query
+        name: reciever_id
+        type: string
+      - description: Notification Status
+        in: query
+        name: status
+        type: string
+      - description: Sender ID
+        in: query
+        name: sender_id
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of notifications
+          schema:
+            $ref: '#/definitions/genproto.NotificationList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List Notifications
+      tags:
+      - Notification
+  /notifications/notify-all:
+    post:
+      consumes:
+      - application/json
+      description: Send a notification to all users in the target group
+      parameters:
+      - description: Notification data
+        in: body
+        name: notification
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.NotificationMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification sent successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Notify All
+      tags:
+      - Notification
+  /report/budget-performance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve budget performance metrics for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Budget performance retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.BudgetPerGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Budget Performance
+      tags:
+      - Report
+  /report/goal-progress:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve goal progress metrics for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Goal progress retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.GoalProgresGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Goal Progress
+      tags:
+      - Report
+  /report/incomes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve incomes for a user within a date range and optional category
+        filter
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: Start Date
+        in: query
+        name: date_from
+        type: string
+      - description: End Date
+        in: query
+        name: date_to
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Incomes retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.IncomeGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Incomes
+      tags:
+      - Report
+  /report/spendings:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve spendings for a user within a date range and optional
+        category filter
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: Start Date
+        in: query
+        name: date_from
+        type: string
+      - description: End Date
+        in: query
+        name: date_to
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/genproto.SpendingGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Spendings
+      tags:
+      - Report
+  /transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete a transaction
+      tags:
+      - Transaction
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.TransactionGet'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get a transaction by ID
+      tags:
+      - Transaction
+  /transactions/{transaction_id}:
+    put:
+      consumes:
+      - application/json
+      description: Update a transaction by its ID and write to Kafka
+      parameters:
+      - in: path
+        name: AccountId
+        type: string
+      - in: path
+        name: Amount
+        type: number
+      - in: path
+        name: CategoryId
+        type: string
+      - in: path
+        name: Description
+        type: string
+      - in: path
+        name: Type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update a transaction
+      tags:
+      - Transaction
+  /transactions/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction for a user account and write to Kafka
+      parameters:
+      - description: Transaction creation details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/genproto.TransactionCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transaction created successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new transaction
+      tags:
+      - Transaction
+  /transactions/list:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of transactions based on filters
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Account ID
+        in: query
+        name: account_id
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: string
+      - description: Transaction Type
+        in: query
+        name: type
+        type: string
+      - description: Transaction Description
+        in: query
+        name: description
+        type: string
+      - description: Time From
+        in: query
+        name: time_from
+        type: string
+      - description: Time To
+        in: query
+        name: time_to
+        type: string
+      - description: Amount From
+        in: query
+        name: amount_from
+        type: number
+      - description: Amount To
+        in: query
+        name: amount_to
+        type: number
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          schema:
+            $ref: '#/definitions/genproto.TransactionList'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: List transactions with filters
+      tags:
+      - Transaction
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

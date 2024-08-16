@@ -1,0 +1,84 @@
+p, admin, /account/create, POST
+p, admin, /account/:id, GET
+p, admin, /account/update/:id, PUT
+p, admin, /account/delete/:id, DELETE
+p, admin, /account/list, GET
+
+p, admin, /budgets/create, POST
+p, admin, /budgets/:id, GET
+p, admin, /budgets/:id, PUT
+p, admin, /budgets/delete/:id, DELETE
+p, admin, /budgets/list, GET
+
+p, admin, /categories/create, POST
+p, admin, /categories/:id, GET
+p, admin, /categories/:id, PUT
+p, admin, /categories/:id, DELETE
+p, admin, /categories/list, GET
+
+p, admin, /goals/create, POST
+p, admin, /goals/:goal_id, GET
+p, admin, /goals/:goal_id, PUT
+p, admin, /goals/:goal_id, DELETE
+p, admin, /goals/list, GET
+
+p, admin, /notifications/create, POST
+p, admin, /notifications/:notification_id, GET
+p, admin, /notifications/:notification_id, PUT
+p, admin, /notifications/:notification_id, DELETE
+p, admin, /notifications/list, GET
+p, admin, /notifications/notify-all, POST
+
+p, admin, /report/spendings, GET
+p, admin, /report/incomes, GET
+p, admin, /report/budget-performance, GET
+p, admin, /report/goal-progress, GET
+
+p, admin, /transactions/create, POST
+p, admin, /transactions/:id, GET
+p, admin, /transactions/:transaction_id, PUT
+p, admin, /transactions/:id, DELETE
+p, admin, /transactions/list, GET
+
+p, user, /account/create, POST
+p, user, /account/:id, GET
+p, user, /account/update/:id, PUT
+p, user, /account/delete/:id, DELETE
+p, user, /account/list, GET
+
+p, user, /budgets/create, POST
+p, user, /budgets/:id, GET
+p, user, /budgets/:id, PUT
+p, user, /budgets/delete/:id, DELETE
+p, user, /budgets/list, GET
+
+p, user, /categories/create, POST
+p, user, /categories/:id, GET
+p, user, /categories/:id, PUT
+p, user, /categories/:id, DELETE
+p, user, /categories/list, GET
+
+p, user, /goals/create, POST
+p, user, /goals/:goal_id, GET
+p, user, /goals/:goal_id, PUT
+p, user, /goals/:goal_id, DELETE
+p, user, /goals/list, GET
+
+p, user, /notifications/create, POST
+p, user, /notifications/:notification_id, GET
+p, user, /notifications/:notification_id, PUT
+p, user, /notifications/:notification_id, DELETE
+p, user, /notifications/list, GET
+p, user, /notifications/notify-all, POST
+
+p, user, /report/spendings, GET
+p, user, /report/incomes, GET
+p, user, /report/budget-performance, GET
+p, user, /report/goal-progress, GET
+
+p, user, /transactions/create, POST
+p, user, /transactions/:id, GET
+p, user, /transactions/:transaction_id, PUT
+p, user, /transactions/:id, DELETE
+p, user, /transactions/list, GET
+

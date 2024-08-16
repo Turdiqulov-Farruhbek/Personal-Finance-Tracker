@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  gateway:
+    container_name: gateway
+    build: .
+    ports:
+      - "5050:5050"
+    networks:
+      - Mynet
+    environment:
+      - KAFKA_BROKER=kafka:9092      
+
+networks:
+  Mynet:
+      external: true
+      name: financer
+      driver: bridge   

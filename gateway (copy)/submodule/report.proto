@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+option go_package = "/internal/pkg/genproto";
+
+package submodule;
+
+import "transaction.proto";
+
+service ReportService {
+    rpc GetSpendings(SpendingReq) returns (SpendingGet);
+    rpc GetIncomes(IncomeReq) returns (IncomeGet);
+    rpc BudgetPerformance(BudgetPerReq) returns (BudgetPerGet);
+    rpc GoalProgress(GoalProgresReq) returns (GoalProgresGet);
+}
+message SpendingReq {
+    string UserId = 1;
+    string DateFrom = 2;
+    string DateTo = 3;
+    string CategoryId = 4;
+}
+message SpendingGet {
+    string Userid = 1;
+    string DateFrom = 2;
+    string DateTo = 3;
+    string CategoryId = 4;
+    float ToatalAmount = 5;
+    repeated TransactionGet Transactions = 6;
+}
+message IncomeReq {
+    string UserId = 1;
+    string DateFrom = 2;
+    string DateTo = 3;
+    string CategoryId = 4;
+}
+message IncomeGet {
+    string UserId = 1;
+    string DateFrom = 2;
+    string DateTo = 3;
+    string CategoryId = 4;
+    float  TotalAmount = 5;
+}
+message BudgetPerReq {
+    string UserId = 1;
+}
+message PeriodBudgetPer {
+    string StartDate = 1;
+    string EndDate = 2;
+    float  AvgSpendings = 3;
+    float  TargetAmount = 5;
+    string Progress = 6;
+    string Period = 7;
+}
+message BudgetPerGet {
+    string UserId = 1;
+    repeated PeriodBudgetPer Performances = 2;
+}
+message GoalProgresReq {
+    string UserId = 1;
+}
+message GoalProgress {
+    string Deadline = 1;
+    float  TargetAmount = 2;
+    float  CurrentAmount = 3;
+    string  Progress = 4;
+    string  GoalName  = 5;
+}
+message GoalProgresGet {
+    string UserId = 1;
+    repeated GoalProgress Goals = 2;
+}
