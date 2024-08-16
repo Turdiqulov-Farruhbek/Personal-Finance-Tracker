@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	t "gitlab.com/saladin2098/finance_tracker1/auth_service/token"
+	t "finance_tracker/auth_service/token"
 
 	"github.com/gin-gonic/gin"
 )

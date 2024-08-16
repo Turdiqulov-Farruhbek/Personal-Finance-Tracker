@@ -5,16 +5,16 @@ import (
 	"log"
 	"net"
 
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/config"
-	pb "gitlab.com/saladin2098/finance_tracker1/notification_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/kafka"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/service"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/storage/postgres"
+	"finance_tracker/notification_service/config"
+	pb "finance_tracker/notification_service/genproto"
+	"finance_tracker/notification_service/kafka"
+	"finance_tracker/notification_service/service"
+	"finance_tracker/notification_service/storage/postgres"
+
 	"google.golang.org/grpc"
 )
 
 func Run(cfg *config.Config) {
-	//connect to db
 	db, err := postgres.ConnectDB(cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -23,10 +23,8 @@ func Run(cfg *config.Config) {
 	//
 	notificationService := service.NewNotificationService(db)
 
-	//kafka\\*//\\\
 	brokers := []string{cfg.KafkaHost + cfg.KafkaPort}
 
-	//kafka producer
 	kafkaProducer, err := kafka.NewKafkaProducer(brokers)
 	if err != nil {
 		log.Fatal(err)

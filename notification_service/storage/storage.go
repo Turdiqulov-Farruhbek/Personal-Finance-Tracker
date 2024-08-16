@@ -1,6 +1,6 @@
 package storage
 
-import pb "gitlab.com/saladin2098/finance_tracker1/notification_service/genproto"
+import pb "finance_tracker/notification_service/genproto"
 
 type StorageI interface {
 	Notification() NotificationI

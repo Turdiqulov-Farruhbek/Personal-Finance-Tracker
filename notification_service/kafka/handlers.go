@@ -5,12 +5,12 @@ import (
 	// "encoding/json"
 	"log"
 
+	pb "finance_tracker/notification_service/genproto"
+	"finance_tracker/notification_service/service"
+
 	"github.com/segmentio/kafka-go"
-	pb "gitlab.com/saladin2098/finance_tracker1/notification_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/service"
 	"google.golang.org/protobuf/encoding/protojson"
 )
-
 
 func NotificationCreateHandler(notifService *service.NotificationService) func(producer KafkaProducer, message kafka.Message) {
 	return func(producer KafkaProducer, message kafka.Message) {
@@ -24,7 +24,7 @@ func NotificationCreateHandler(notifService *service.NotificationService) func(p
 
 		res, err := notifService.CreateNotification(context.Background(), &notif)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("error while creating notification through kafka" + err.Error())
 			return
 		}
 		log.Printf("Created notification: %+v", res)
@@ -32,7 +32,6 @@ func NotificationCreateHandler(notifService *service.NotificationService) func(p
 }
 func NotifyAllHandler(notifService *service.NotificationService) func(producer KafkaProducer, message kafka.Message) {
 	return func(producer KafkaProducer, message kafka.Message) {
-
 
 		//unmarshal the message
 		var req pb.NotificationMessage

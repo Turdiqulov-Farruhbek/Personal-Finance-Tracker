@@ -3,7 +3,7 @@ package helper
 import (
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
+	pb "finance_tracker/budget/internal/pkg/genproto"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

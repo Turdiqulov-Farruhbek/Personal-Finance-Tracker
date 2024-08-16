@@ -4,13 +4,12 @@ import (
 	"log"
 	"time"
 
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/api"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/api/handler"
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/kafka"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/server"
+	"finance_tracker/auth_service/api"
+	"finance_tracker/auth_service/api/handler"
+	pb "finance_tracker/auth_service/genproto"
+	"finance_tracker/auth_service/kafka"
+	"finance_tracker/auth_service/server"
 
-	// "gitlab.com/saladin2098/finance_tracker1/auth_service/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -19,14 +18,14 @@ func main() {
 
 	go server.Server()
 
-	auth, err := grpc.NewClient("localhost:50050", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	auth, err := grpc.NewClient("auth_service:40040", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	//kafka\\//
 	time.Sleep(10 * time.Second)
-	kafka, err := kafka.NewKafkaProducer([]string{"localhost:9092"}) ////////////////////////////////////////
+	kafka, err := kafka.NewKafkaProducer([]string{"kafka:9092"})
 	if err != nil {
 		log.Fatal(err)
 		return

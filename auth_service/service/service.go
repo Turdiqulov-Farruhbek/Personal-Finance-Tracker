@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/storage"
+	pb "finance_tracker/auth_service/genproto"
+	"finance_tracker/auth_service/storage"
 )
 
 type UserService struct {

@@ -3,10 +3,12 @@ package repo
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
+	pb "finance_tracker/budget/internal/pkg/genproto"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,8 +18,8 @@ type BudgetRepo struct {
 }
 
 func NewBudgetRepo(mdb *mongo.Database) *BudgetRepo {
-    db := mdb.Collection("budget")
-    return &BudgetRepo{mdb: db}
+	db := mdb.Collection("budget")
+	return &BudgetRepo{mdb: db}
 }
 func (r *BudgetRepo) CreateBudget(req *pb.BudgetCreate) (*pb.Void, error) {
 	now := time.Now().Format(time.RFC3339)
@@ -42,6 +44,10 @@ func (r *BudgetRepo) CreateBudget(req *pb.BudgetCreate) (*pb.Void, error) {
 	return &pb.Void{}, nil
 }
 func (r *BudgetRepo) UpdateBudget(req *pb.BudgetUpdate) (*pb.Void, error) {
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
 	updateFields := bson.M{}
 	if req.Body.UserId != "" {
 		updateFields["user_id"] = req.Body.UserId
@@ -63,10 +69,10 @@ func (r *BudgetRepo) UpdateBudget(req *pb.BudgetUpdate) (*pb.Void, error) {
 	}
 	updateFields["updated_at"] = time.Now().Format(time.RFC3339)
 
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	update := bson.M{"$set": updateFields}
 
-	_, err := r.mdb.UpdateOne(context.Background(), filter, update)
+	_, err = r.mdb.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +80,16 @@ func (r *BudgetRepo) UpdateBudget(req *pb.BudgetUpdate) (*pb.Void, error) {
 	return &pb.Void{}, nil
 }
 func (r *BudgetRepo) DeleteBudget(req *pb.ById) (*pb.Void, error) {
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
 	deletedAt := time.Now().Unix()
 
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	update := bson.M{"$set": bson.M{"deleted_at": deletedAt}}
 
-	_, err := r.mdb.UpdateOne(context.Background(), filter, update)
+	_, err = r.mdb.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +98,11 @@ func (r *BudgetRepo) DeleteBudget(req *pb.ById) (*pb.Void, error) {
 }
 func (r *BudgetRepo) GetBudget(req *pb.ById) (*pb.BudgetGet, error) {
 	var budget pb.BudgetGet
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	projection := bson.M{
 		"_id":         1,
 		"user_id":     1,
@@ -98,8 +112,9 @@ func (r *BudgetRepo) GetBudget(req *pb.ById) (*pb.BudgetGet, error) {
 		"start_date":  1,
 		"end_date":    1,
 	}
+	var bud Budget
 
-	err := r.mdb.FindOne(context.Background(), filter, options.FindOne().SetProjection(projection)).Decode(&budget)
+	err = r.mdb.FindOne(context.Background(), filter, options.FindOne().SetProjection(projection)).Decode(&bud)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("budget not found")
@@ -109,11 +124,18 @@ func (r *BudgetRepo) GetBudget(req *pb.ById) (*pb.BudgetGet, error) {
 
 	// Map MongoDB Object ID to proto Id field
 	budget.Id = req.Id
+	budget.UserId = bud.UserId
+	budget.CategoryId = bud.CategoryId
+	budget.Amount = bud.Amount
+	budget.Period = bud.Period
+	budget.StartDate = bud.StartDate
+	budget.EndDate = bud.EndDate
 
 	return &budget, nil
 }
 func (r *BudgetRepo) ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error) {
 	filter := bson.M{"deleted_at": 0}
+	log.Println("ListBudgets user id ", req.UserId)
 
 	if req.UserId != "" {
 		filter["user_id"] = req.UserId
@@ -124,9 +146,9 @@ func (r *BudgetRepo) ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error) {
 	if req.Status != "" && req.Status == "completed" {
 		filter["end_date"] = bson.M{"$lte": time.Now().Format(time.RFC3339)}
 	}
-	if req.Status!= "" && req.Status == "ongoing" {
-        filter["end_date"] = bson.M{"$gt": time.Now().Format(time.RFC3339)}
-    }
+	if req.Status != "" && req.Status == "ongoing" {
+		filter["end_date"] = bson.M{"$gt": time.Now().Format(time.RFC3339)}
+	}
 	if req.AmountFrom != 0 || req.AmountTo != 0 {
 		amountFilter := bson.M{}
 		if req.AmountFrom != 0 {
@@ -167,19 +189,23 @@ func (r *BudgetRepo) ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error) {
 	var budgets []*pb.BudgetGet
 	for cursor.Next(context.Background()) {
 		var budget pb.BudgetGet
-		if err := cursor.Decode(&budget); err != nil {
+		var bud Budget
+		if err := cursor.Decode(&bud); err != nil {
 			return nil, err
 		}
 		// Map MongoDB Object ID to proto Id field
 		budget.Id = cursor.Current.Lookup("_id").ObjectID().Hex()
+		budget.UserId = bud.UserId
+		budget.CategoryId = bud.CategoryId
+		budget.Amount = bud.Amount
+		budget.Period = bud.Period
+		budget.StartDate = bud.StartDate
+		budget.EndDate = bud.EndDate
 
 		budgets = append(budgets, &budget)
 	}
 
-	totalCount, err := r.mdb.CountDocuments(context.Background(), filter)
-	if err != nil {
-		return nil, err
-	}
+	totalCount := len(budgets)
 
 	return &pb.BudgetList{
 		Budgets:    budgets,
@@ -187,4 +213,15 @@ func (r *BudgetRepo) ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error) {
 		Limit:      req.Filter.Limit,
 		Offset:     req.Filter.Offset,
 	}, nil
+}
+
+type Budget struct {
+	UserId     string  `bson:"user_id"`
+	CategoryId string  `bson:"category_id"`
+	Amount     float32 `bson:"amount"`
+	Period     string  `bson:"period"`
+	StartDate  string  `bson:"start_date"`
+	EndDate    string  `bson:"end_date"`
+	CreatedAt  string  `bson:"created_at"`
+	UpdatedAt  string  `bson:"updated_at"`
 }

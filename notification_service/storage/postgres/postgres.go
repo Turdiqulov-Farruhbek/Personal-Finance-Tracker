@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
+	"finance_tracker/notification_service/config"
+	pb "finance_tracker/notification_service/genproto"
+	"finance_tracker/notification_service/storage"
+
 	_ "github.com/lib/pq"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/config"
-	pb "gitlab.com/saladin2098/finance_tracker1/notification_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/storage"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -5,8 +5,8 @@ package repo
 // 	"fmt"
 // 	"time"
 
-// 	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
-// 	"gitlab.com/saladin2098/finance_tracker1/budget/internal/usecases/kafka"
+// 	pb "finance_tracker/budget/internal/pkg/genproto"
+// 	"finance_tracker/budget/internal/usecases/kafka"
 // 	"go.mongodb.org/mongo-driver/bson"
 // 	"go.mongodb.org/mongo-driver/mongo"
 // 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -82,10 +82,6 @@ package repo
 // 		return nil, err
 // 	}
 
-
-
-
-
 // 	// Check for budget targets if the transaction is a debit
 // 	if req.Type == "credit" {
 // 		budgetFilter := bson.M{"user_id": req.UserId, "end_date": bson.M{"$gt": time.Now().Format("2006-01-02")}, "deleted_at": 0}
@@ -138,7 +134,7 @@ package repo
 // 	goalFilter := bson.M{"user_id": req.UserId,
 // 						"end_date":   bson.M{"$gt": time.Now()},
 // 						"deleted_at": 0}
-// 	var goal pb.GoalGet					
+// 	var goal pb.GoalGet
 // 	r.goalDB.FindOne(context.TODO(),goalFilter).Decode(&goal)
 // 	if req.Type == "debit" {
 // 		goalProgress := goal.CurrentAmount + req.Amount
@@ -162,7 +158,7 @@ package repo
 //         if err!= nil {
 //             return nil, err
 //         }
-// 	}				
+// 	}
 // 	if req.Type == "credit" {
 // 		goalProgress := goal.CurrentAmount - req.Amount
 //         if goalProgress < 0 {

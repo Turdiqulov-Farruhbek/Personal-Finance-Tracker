@@ -1,8 +1,8 @@
 
 
-DBURL="postgres://postgres:00salom00@localhost:5432/delivery_product?sslmode=disable"
+DBURL="postgres://postgres:root@localhost:5432/delivery_product?sslmode=disable"
 exp:
-	export DBURL="postgres://postgres:00salom00@localhost:5432/delivery_product?sslmode=disable"
+	export DBURL="postgres://postgres:root@localhost:5432/delivery_product?sslmode=disable"
 
 mig-up:
 	migrate -path migrations -database ${DBURL} -verbose up

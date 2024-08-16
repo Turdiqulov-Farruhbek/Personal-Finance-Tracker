@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	// pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
+	// pb "finance_tracker/auth_service/genproto"
 )
 
 const (
-	signingKey = "Secret key for auth service"
+	signingKey = "secret_key"
 )
 
 func GenerateJWTToken(userID, username, role interface{}) (string, string) {

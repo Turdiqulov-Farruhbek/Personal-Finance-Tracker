@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/config"
+	"finance_tracker/budget/internal/pkg/config"
 )
 
 type Postgres struct {
@@ -22,11 +22,11 @@ func New(cfg *config.Config) (*Postgres, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
 
-    return &Postgres{DB: db}, nil
+	return &Postgres{DB: db}, nil
 }

@@ -1,13 +1,14 @@
 package api
 
 import (
+	"finance_tracker/auth_service/api/handler"
+	"finance_tracker/auth_service/middleware"
+
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/api/handler"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/middleware"
 
-	_ "gitlab.com/saladin2098/finance_tracker1/auth_service/docs"
+	_ "finance_tracker/auth_service/docs"
 )
 
 // @Title Finance Tarcker Auth service API Documentation

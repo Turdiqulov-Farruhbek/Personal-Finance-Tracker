@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  auth-service:
+    container_name: notification
+    build: ./
+    ports:
+      - "30030:30030"
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true
+    name: financer
+    driver: bridge

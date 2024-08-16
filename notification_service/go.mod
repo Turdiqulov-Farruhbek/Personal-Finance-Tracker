@@ -1,4 +1,4 @@
-module gitlab.com/saladin2098/finance_tracker1/notification_service
+module finance_tracker/notification_service
 
 go 1.22.1
 

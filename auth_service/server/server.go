@@ -6,10 +6,11 @@ import (
 	"net"
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/kafka"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/service"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/storage/postgres"
+	pb "finance_tracker/auth_service/genproto"
+	"finance_tracker/auth_service/kafka"
+	"finance_tracker/auth_service/service"
+	"finance_tracker/auth_service/storage/postgres"
+
 	"google.golang.org/grpc"
 )
 
@@ -22,9 +23,8 @@ func Server() {
 
 	userService := service.NewUserService(db)
 
-	//*kafka\\//\\
-	time.Sleep(time.Second * 20)
-	brokers := []string{"localhost:9092"} //////////////////////////////////////////////////////
+	time.Sleep(time.Second * 10)
+	brokers := []string{"kafka:9092"}
 
 	kcm := kafka.NewKafkaConsumerManager()
 
@@ -42,16 +42,15 @@ func Server() {
 			log.Fatalf("Error registering consumer: %v", err)
 		}
 	}
-	// *kafka\\//\\
 
 	newServer := grpc.NewServer()
 	pb.RegisterAuthServiceServer(newServer, service.NewUserService(db))
 
-	lis, err := net.Listen("tcp", ":50050")
+	lis, err := net.Listen("tcp", ":40040")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Server is running on :50050")
+	fmt.Println("Server is running on :40040")
 	err = newServer.Serve(lis)
 	if err != nil {
 		log.Fatal(err)

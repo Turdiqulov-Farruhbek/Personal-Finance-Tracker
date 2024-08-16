@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/budget/internal/storage"
+	pb "finance_tracker/budget/internal/pkg/genproto"
+	"finance_tracker/budget/internal/storage"
 )
 
 type ReportService struct {
@@ -25,6 +26,7 @@ func (s *ReportService) GetSpendings(ctx context.Context, req *pb.SpendingReq) (
 		TimeFrom:   req.DateFrom,
 		TimeTo:     req.DateTo,
 		CategoryId: req.CategoryId,
+		Filter:     &pb.Filter{},
 	}
 	transactions, err := s.stg.Transaction().ListTransactions(&transaction_filter)
 	if err != nil {
@@ -50,6 +52,7 @@ func (s *ReportService) GetIncomes(ctx context.Context, req *pb.IncomeReq) (*pb.
 		TimeFrom:   req.DateFrom,
 		TimeTo:     req.DateTo,
 		CategoryId: req.CategoryId,
+		Filter:     &pb.Filter{},
 	}
 	transactions, err := s.stg.Transaction().ListTransactions(&transaction_filter)
 	if err != nil {
@@ -67,84 +70,42 @@ func (s *ReportService) GetIncomes(ctx context.Context, req *pb.IncomeReq) (*pb.
 		TotalAmount: total_incomes,
 	}, nil
 }
-func (s *ReportService) BudgetPerformance(ctx context.Context, req *pb.BudgetPerReq) (*pb.BudgetPerGet, error) {
-	// Retrieve all budgets for the user
-	budgets, err := s.stg.Budget().ListBudgets(&pb.BudgetFilter{
+
+func (s *ReportService) GoalProgress(ctx context.Context, req *pb.GoalProgresReq) (*pb.GoalProgresGet, error) {
+	// Retrieve all goals for the user
+	goals, err := s.stg.Goal().ListGoals(&pb.GoalFilter{
 		UserId: req.UserId,
+		Filter: &pb.Filter{},
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	var performances []*pb.PeriodBudgetPer
-
-	for _, budget := range budgets.Budgets {
-		var avgSpendings float32
-		var progress string
-		var totalPeriods int
-		var periodsOverBudget int
-
-		// Determine the budget's period type and calculate spendings accordingly
-		switch budget.Period {
-		case "daily":
-			// Calculate daily spendings within the budget's timeline
-			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24)
-		case "weekly":
-			// Calculate weekly spendings within the budget's timeline
-			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*7)
-		case "monthly":
-			// Calculate monthly spendings within the budget's timeline
-			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*30)
-		case "yearly":
-			// Calculate yearly spendings within the budget's timeline
-			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*365)
-		}
-
-		if periodsOverBudget > 0 {
-			progress = fmt.Sprintf("Over budget %d times out of %d periods", periodsOverBudget, totalPeriods)
-		} else {
-			progress = "Within budget for all periods"
-		}
-
-		performances = append(performances, &pb.PeriodBudgetPer{
-			StartDate:    budget.StartDate,
-			EndDate:      budget.EndDate,
-			AvgSpendings: float32(avgSpendings),
-			TargetAmount: budget.Amount,
-			Progress:     progress,
-			Period:       budget.Period,
-		})
-	}
-
-	return &pb.BudgetPerGet{
-		UserId:       req.UserId,
-		Performances: performances,
-	}, nil
-}
-
-func (s *ReportService) GoalProgress(ctx context.Context, req *pb.GoalProgresReq) (*pb.GoalProgresGet, error) {
-	// Retrieve all goals for the user
-	goals, err := s.stg.Goal().ListGoals(&pb.GoalFilter{UserId: req.UserId})
-	if err != nil {
-		return nil, err
-	}
+	log.Println("GoalS", goals)
 
 	var goalProgresses []*pb.GoalProgress
 
 	for _, goal := range goals.Goals {
 		// Calculate total income within the goal's timeline
-		startDate, _ := time.Parse(time.RFC3339, goal.CreatedAt)
-		deadline, _ := time.Parse(time.RFC3339, goal.Deadline)
+		log.Println("timelines in goal ", goal.CreatedAt, goal.Deadline)
+		startDate := goal.CreatedAt
+		deadlineStr, err := time.Parse("02-01-2006", goal.Deadline)
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return nil, err
+		}
+		deadline := deadlineStr.Format("2006-01-02 15:04:05 -0700 MST")
 
 		trs, err := s.stg.Transaction().ListTransactions(&pb.TransactionFilter{
 			UserId:   goal.UserId,
-			Type:     "credit", // Credit indicates income
-			TimeFrom: startDate.Format(time.RFC3339),
-			TimeTo:   deadline.Format(time.RFC3339),
+			Type:     "debit", // Credit indicates income
+			TimeFrom: startDate,
+			TimeTo:   deadline,
+			Filter:   &pb.Filter{},
 		})
 		if err != nil {
 			return nil, err
 		}
+		log.Println("transactions", trs)
 
 		var totalIncome float32
 		for _, tr := range trs.TransactionGet {
@@ -158,6 +119,7 @@ func (s *ReportService) GoalProgress(ctx context.Context, req *pb.GoalProgresReq
 		} else {
 			progress = fmt.Sprintf("Current progress: %.2f%%", (totalIncome/goal.TargetAmount)*100)
 		}
+		log.Println(totalIncome, "total income form report ")
 
 		goalProgresses = append(goalProgresses, &pb.GoalProgress{
 			Deadline:      goal.Deadline,
@@ -174,25 +136,85 @@ func (s *ReportService) GoalProgress(ctx context.Context, req *pb.GoalProgresReq
 	}, nil
 }
 
+func (s *ReportService) BudgetPerformance(ctx context.Context, req *pb.BudgetPerReq) (*pb.BudgetPerGet, error) {
+	// Retrieve all budgets for the user
+	budgets, err := s.stg.Budget().ListBudgets(&pb.BudgetFilter{
+		UserId: req.UserId,
+		Filter: &pb.Filter{},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var performances []*pb.PeriodBudgetPer
+
+	for _, budget := range budgets.Budgets {
+		var avgSpendings float32
+		var progress string
+		var totalPeriods int
+		var periodsOverBudget int
+
+		// Determine the budget's period type and calculate spendings accordingly
+		switch budget.Period {
+		case "daily":
+			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24)
+		case "weekly":
+			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*7)
+		case "monthly":
+			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*30)
+		case "yearly":
+			totalPeriods, periodsOverBudget, avgSpendings = s.calculatePeriodPerformance(budget, time.Hour*24*365)
+		default:
+			// Handle unexpected period types
+			continue
+		}
+
+		if periodsOverBudget > 0 {
+			progress = fmt.Sprintf("Over budget %d times out of %d periods", periodsOverBudget, totalPeriods)
+		} else {
+			progress = "Within budget for all periods"
+		}
+
+		performances = append(performances, &pb.PeriodBudgetPer{
+			StartDate:    budget.StartDate,
+			EndDate:      budget.EndDate,
+			AvgSpendings: avgSpendings,
+			TargetAmount: budget.Amount,
+			Progress:     progress,
+			Period:       budget.Period,
+		})
+	}
+
+	return &pb.BudgetPerGet{
+		UserId:       req.UserId,
+		Performances: performances,
+	}, nil
+}
+
 func (s *ReportService) calculatePeriodPerformance(budget *pb.BudgetGet, periodDuration time.Duration) (totalPeriods int, periodsOverBudget int, avgSpendings float32) {
 	// Calculate the total number of periods in the budget's timeline
-	startDate, _ := time.Parse(time.RFC3339, budget.StartDate)
-	endDate, _ := time.Parse(time.RFC3339, budget.EndDate)
+	startDate, _ := time.Parse("02-01-2006", budget.StartDate)
+	endDate, _ := time.Parse("02-01-2006", budget.EndDate)
 	duration := endDate.Sub(startDate)
 	totalPeriods = int(duration / periodDuration)
+	log.Println("total periods ", totalPeriods)
 
 	var totalSpendings float32
-	for i := 0; i < totalPeriods; i++ {
+	for i := 0; i <= totalPeriods; i++ {
 		periodStart := startDate.Add(time.Duration(i) * periodDuration)
 		periodEnd := periodStart.Add(periodDuration)
 
-		// Calculate the total spendings for this period
-		trs, _ := s.stg.Transaction().ListTransactions(&pb.TransactionFilter{
+		// Retrieve transactions for the period
+		trs, err := s.stg.Transaction().ListTransactions(&pb.TransactionFilter{
 			UserId:   budget.UserId,
-            Type:     "debit", // Debit indicates spending
-            TimeFrom: periodStart.Format(time.RFC3339),
-            TimeTo:   periodEnd.Format(time.RFC3339),
+			Type:     "credit", // Debit indicates spending
+			TimeFrom: periodStart.String(),
+			TimeTo:   periodEnd.String(),
+			Filter:   &pb.Filter{},
 		})
+		if err != nil {
+			return 0, 0, 0 // Handle error appropriately in production code
+		}
 
 		var spendings float32
 		for _, tr := range trs.TransactionGet {
@@ -206,7 +228,12 @@ func (s *ReportService) calculatePeriodPerformance(budget *pb.BudgetGet, periodD
 		}
 	}
 
-	avgSpendings = totalSpendings / float32(totalPeriods)
-	return
-}
+	if totalPeriods > 0 {
+		avgSpendings = totalSpendings / float32(totalPeriods)
+	} else {
+		avgSpendings = 0
+	}
 
+	log.Println(avgSpendings)
+	return totalPeriods, periodsOverBudget, avgSpendings
+}

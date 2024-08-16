@@ -1,7 +1,7 @@
 package storage
 
 import (
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
+	pb "finance_tracker/auth_service/genproto"
 )
 
 type StorageI interface {

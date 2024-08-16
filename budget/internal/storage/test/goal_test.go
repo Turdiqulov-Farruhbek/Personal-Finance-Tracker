@@ -7,10 +7,10 @@ package tests
 // 	"testing"
 // 	"time"
 
-// 	"gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
-// 	"gitlab.com/saladin2098/finance_tracker1/budget/internal/storage/repo"
+// 	"finance_tracker/budget/internal/pkg/genproto"
+// 	"finance_tracker/budget/internal/storage/repo"
 
-// 	// "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/repo"
+// 	// "finance_tracker/budget/internal/pkg/repo"
 // 	"github.com/stretchr/testify/assert"
 // 	"go.mongodb.org/mongo-driver/bson"
 // 	"go.mongodb.org/mongo-driver/bson/primitive"

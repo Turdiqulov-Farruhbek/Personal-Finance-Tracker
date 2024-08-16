@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
+	"finance_tracker/auth_service/config"
+	"finance_tracker/auth_service/storage"
+
 	"github.com/go-redis/redis"
 	_ "github.com/lib/pq"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/config"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/storage"
 )
 
 type Storage struct {
@@ -33,7 +34,7 @@ func ConnectDB() (*Storage, error) {
 		return nil, err
 	}
 	rdb := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: "redis:6379",
 	})
 
 	userS := NewUserRepo(db, rdb)

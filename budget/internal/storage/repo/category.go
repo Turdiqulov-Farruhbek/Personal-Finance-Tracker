@@ -3,10 +3,12 @@ package repo
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
+	pb "finance_tracker/budget/internal/pkg/genproto"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,7 +19,7 @@ type CategoryRepo struct {
 
 func NewCategoryRepo(mdb *mongo.Database) *CategoryRepo {
 	db := mdb.Collection("category")
-    return &CategoryRepo{mdb: db}
+	return &CategoryRepo{mdb: db}
 }
 
 func (r *CategoryRepo) CreateCategory(req *pb.CategoryCreate) (*pb.Void, error) {
@@ -41,6 +43,10 @@ func (r *CategoryRepo) CreateCategory(req *pb.CategoryCreate) (*pb.Void, error) 
 }
 
 func (r *CategoryRepo) UpdateCategory(req *pb.CategoryUpdate) (*pb.Void, error) {
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
 	updateFields := bson.M{}
 	if req.Category.Name != "" {
 		updateFields["name"] = req.Category.Name
@@ -50,10 +56,10 @@ func (r *CategoryRepo) UpdateCategory(req *pb.CategoryUpdate) (*pb.Void, error) 
 	}
 	updateFields["updated_at"] = time.Now().Format(time.RFC3339)
 
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	update := bson.M{"$set": updateFields}
 
-	_, err := r.mdb.UpdateOne(context.Background(), filter, update)
+	_, err = r.mdb.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +67,16 @@ func (r *CategoryRepo) UpdateCategory(req *pb.CategoryUpdate) (*pb.Void, error) 
 	return &pb.Void{}, nil
 }
 func (r *CategoryRepo) DeleteCategory(req *pb.ById) (*pb.Void, error) {
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
 	deletedAt := time.Now().Unix()
 
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	update := bson.M{"$set": bson.M{"deleted_at": deletedAt}}
 
-	_, err := r.mdb.UpdateOne(context.Background(), filter, update)
+	_, err = r.mdb.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return nil, err
 	}
@@ -74,8 +84,15 @@ func (r *CategoryRepo) DeleteCategory(req *pb.ById) (*pb.Void, error) {
 	return &pb.Void{}, nil
 }
 func (r *CategoryRepo) GetCategory(req *pb.ById) (*pb.CategoryGet, error) {
+	log.Println(req.Id)
+	obj_id, err := primitive.ObjectIDFromHex(req.Id)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(obj_id)
 	var category pb.CategoryGet
-	filter := bson.M{"_id": req.Id, "deleted_at": 0}
+
+	filter := bson.M{"_id": obj_id, "deleted_at": 0}
 	projection := bson.M{
 		"_id":        1,
 		"user_id":    1,
@@ -84,8 +101,9 @@ func (r *CategoryRepo) GetCategory(req *pb.ById) (*pb.CategoryGet, error) {
 		"created_at": 1,
 		"updated_at": 1,
 	}
+	var cat Category
 
-	err := r.mdb.FindOne(context.Background(), filter, options.FindOne().SetProjection(projection)).Decode(&category)
+	err = r.mdb.FindOne(context.Background(), filter, options.FindOne().SetProjection(projection)).Decode(&cat)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, fmt.Errorf("category not found")
@@ -95,9 +113,15 @@ func (r *CategoryRepo) GetCategory(req *pb.ById) (*pb.CategoryGet, error) {
 
 	// Map MongoDB Object ID to proto Id field
 	category.Id = req.Id
+	category.UserId = cat.UserId
+	category.Name = cat.Name
+	category.Type = cat.Type
+	category.CreatedAt = cat.CreatedAt
+	category.UpdatedAt = cat.UpdatedAt
 
 	return &category, nil
 }
+
 func (r *CategoryRepo) ListCategories(req *pb.CategoryFilter) (*pb.CategoryList, error) {
 	filter := bson.M{"deleted_at": 0}
 
@@ -136,16 +160,22 @@ func (r *CategoryRepo) ListCategories(req *pb.CategoryFilter) (*pb.CategoryList,
 	var categories []*pb.CategoryGet
 	for cursor.Next(context.Background()) {
 		var category pb.CategoryGet
-		if err := cursor.Decode(&category); err != nil {
+		var cat Category
+		if err := cursor.Decode(&cat); err != nil {
 			return nil, err
 		}
 		// Map MongoDB Object ID to proto Id field
 		category.Id = cursor.Current.Lookup("_id").ObjectID().Hex()
+		category.UserId = cat.UserId
+		category.Name = cat.Name
+		category.Type = cat.Type
+		category.CreatedAt = cat.CreatedAt
+		category.UpdatedAt = cat.UpdatedAt
 
 		categories = append(categories, &category)
 	}
 
-	totalCount, err := r.mdb.CountDocuments(context.Background(), filter)
+	totalCount := len(categories)
 	if err != nil {
 		return nil, err
 	}
@@ -158,3 +188,10 @@ func (r *CategoryRepo) ListCategories(req *pb.CategoryFilter) (*pb.CategoryList,
 	}, nil
 }
 
+type Category struct {
+	UserId    string `bson:"user_id"`
+	Name      string `bson:"name"`
+	Type      string `bson:"type"`
+	CreatedAt string `bson:"created_at"`
+	UpdatedAt string `bson:"updated_at"`
+}

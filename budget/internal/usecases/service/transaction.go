@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/budget/internal/pkg/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/budget/internal/storage"
-	"gitlab.com/saladin2098/finance_tracker1/budget/internal/usecases/kafka"
+	pb "finance_tracker/budget/internal/pkg/genproto"
+	"finance_tracker/budget/internal/storage"
+	"finance_tracker/budget/internal/usecases/kafka"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -24,7 +24,6 @@ func NewTransactionService(stg storage.StorageI, kafka kafka.KafkaProducer) *Tra
 		producer: kafka,
 	}
 }
-
 
 func (s *TransactionService) CreateTransaction(ctx context.Context, req *pb.TransactionCreate) (*pb.Void, error) {
 	//check the account balance
@@ -54,7 +53,11 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, req *pb.Tran
 	}
 	// Check for budget targets if the transaction is a credit
 	if req.Type == "credit" {
-		budgetFilter := pb.BudgetFilter{UserId: req.UserId, Status: "ongoing"}
+		budgetFilter := pb.BudgetFilter{
+			UserId: req.UserId,
+			Status: "ongoing",
+			Filter: &pb.Filter{},
+		}
 		budgets, err := s.stg.Budget().ListBudgets(&budgetFilter)
 		if err != nil {
 			return nil, err
@@ -68,34 +71,34 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, req *pb.Tran
 			case "daily":
 				timeFrom = time.Now().Format("2006-01-02")
 				timeTo = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
-			
+
 			case "weekly":
 				timeFrom = time.Now().AddDate(0, 0, -int(time.Now().Weekday())).Format("2006-01-02")
 				timeTo = time.Now().AddDate(0, 0, 7-int(time.Now().Weekday())).Format("2006-01-02")
-			
+
 			case "monthly":
 				firstDayOfMonth := time.Date(time.Now().Year(), time.Now().Month(), 1, 0, 0, 0, 0, time.Now().Location())
 				timeFrom = firstDayOfMonth.Format("2006-01-02")
 				timeTo = firstDayOfMonth.AddDate(0, 1, 0).Format("2006-01-02")
-			
+
 			case "yearly":
 				firstDayOfYear := time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.Now().Location())
 				timeFrom = firstDayOfYear.Format("2006-01-02")
 				timeTo = firstDayOfYear.AddDate(1, 0, 0).Format("2006-01-02")
-			
+
 			default:
-				return nil,fmt.Errorf("invalid budget period: %s", budget.Period)
+				return nil, fmt.Errorf("invalid budget period: %s", budget.Period)
 			}
-			
 
 			cursor, err := s.stg.Transaction().ListTransactions(&pb.TransactionFilter{
 				AccountId: req.AccountId,
 				Type:      "credit",
 				TimeFrom:  timeFrom,
 				TimeTo:    timeTo,
+				Filter:    &pb.Filter{},
 			})
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 
 			// Calculate the total spendings within the selected time range
@@ -116,82 +119,82 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, req *pb.Tran
 				// Marshal the notification into JSON
 				input, err := protojson.Marshal(&notification)
 				if err != nil {
-					return nil,err
+					return nil, err
 				}
 
 				// Produce the notification message to the Kafka topic
 				if err := s.producer.ProduceMessages("notification-create", input); err != nil {
-					return nil,err
+					return nil, err
 				}
 			}
 
 		}
-	} 
+	}
 
 	//update goal
 	filter := pb.GoalFilter{
 		UserId: req.UserId,
-		Status: "ongoing",
+		Status: "active",
 	}
-	goals,err := s.stg.Goal().ListGoals(&filter)
-	if err!= nil {
+	filter.Filter = &pb.Filter{}
+	goals, err := s.stg.Goal().ListGoals(&filter)
+	if err != nil {
 		return nil, err
 	}
 	goal := goals.Goals[0]
 	if req.Type == "debit" {
 		goalProgress := goal.CurrentAmount + req.Amount
-        if goalProgress >= goal.TargetAmount {
-            message := fmt.Sprintf("Congratulations! You have reached your goal of $%v", goal.TargetAmount)
-            notification := pb.NotificationCreate{
-                RecieverId: req.UserId,
-                Message:    message,
-            }
-            input, err := protojson.Marshal(&notification)
-            if err!= nil {
-                return nil, err
-            }
-            err = s.producer.ProduceMessages("notification-create", input)
-            if err!= nil {
-                return nil, err
-            }
-        }
-        _,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+		if goalProgress >= goal.TargetAmount {
+			message := fmt.Sprintf("Congratulations! You have reached your goal of $%v", goal.TargetAmount)
+			notification := pb.NotificationCreate{
+				RecieverId: req.UserId,
+				Message:    message,
+			}
+			input, err := protojson.Marshal(&notification)
+			if err != nil {
+				return nil, err
+			}
+			err = s.producer.ProduceMessages("notification-create", input)
+			if err != nil {
+				return nil, err
+			}
+		}
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
 			Id:   goal.Id,
-            Body: &pb.GoalUpt{CurrentAmount: goalProgress},
+			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
 		})
-        if err!= nil {
-            return nil, err
-        }
-		
+		if err != nil {
+			return nil, err
+		}
+
 	} else {
 		goalProgress := goal.CurrentAmount - req.Amount
-        _,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
-            Id:   goal.Id,
-            Body: &pb.GoalUpt{CurrentAmount: goalProgress},
-        })
-        if err!= nil {
-            return nil, err
-        }
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+			Id:   goal.Id,
+			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 
-
 	// send notification to kafka
-	message := fmt.Sprintf("A new amount %.2f has been %ved from your account with id: %v", req.Amount, req.Type,req.AccountId)
-    notification := pb.NotificationCreate{
-        RecieverId: req.UserId,
-        Message:    message,
-    }
+	message := fmt.Sprintf("A new amount %.2f has been %ved from your account with id: %v", req.Amount, req.Type, req.AccountId)
+	notification := pb.NotificationCreate{
+		RecieverId: req.UserId,
+		Message:    message,
+	}
 
-    input, err := protojson.Marshal(&notification)
-    if err!= nil {
-        return nil, err
-    }
+	input, err := protojson.Marshal(&notification)
+	if err != nil {
+		return nil, err
+	}
 
-    if err := s.producer.ProduceMessages("notification-create", input); err!= nil {
-        return nil, err
-    }
+	if err := s.producer.ProduceMessages("notification-create", input); err != nil {
+		return nil, err
+	}
 
-    return s.stg.Transaction().CreateTransaction(req)
+	return s.stg.Transaction().CreateTransaction(req)
 }
 
 func (s *TransactionService) GetTransaction(ctx context.Context, req *pb.ById) (*pb.TransactionGet, error) {
@@ -201,12 +204,12 @@ func (s *TransactionService) GetTransaction(ctx context.Context, req *pb.ById) (
 func (s *TransactionService) UpdateTransaction(ctx context.Context, req *pb.TransactionUpdate) (*pb.Void, error) {
 	//get the current tarnaction to compare
 	currentTransaction, err := s.stg.Transaction().GetTransaction(&pb.ById{Id: req.Id})
-    if err!= nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
 	difference := req.Body.Amount - currentTransaction.Amount
-	
+
 	//check the account balance
 	account_id := pb.ById{Id: currentTransaction.AccountId}
 	account, err := s.stg.Account().GetAccount(&account_id)
@@ -250,25 +253,24 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, req *pb.Tran
 			case "daily":
 				timeFrom = time.Now().Format("2006-01-02")
 				timeTo = time.Now().AddDate(0, 0, 1).Format("2006-01-02")
-			
+
 			case "weekly":
 				timeFrom = time.Now().AddDate(0, 0, -int(time.Now().Weekday())).Format("2006-01-02")
 				timeTo = time.Now().AddDate(0, 0, 7-int(time.Now().Weekday())).Format("2006-01-02")
-			
+
 			case "monthly":
 				firstDayOfMonth := time.Date(time.Now().Year(), time.Now().Month(), 1, 0, 0, 0, 0, time.Now().Location())
 				timeFrom = firstDayOfMonth.Format("2006-01-02")
 				timeTo = firstDayOfMonth.AddDate(0, 1, 0).Format("2006-01-02")
-			
+
 			case "yearly":
 				firstDayOfYear := time.Date(time.Now().Year(), time.January, 1, 0, 0, 0, 0, time.Now().Location())
 				timeFrom = firstDayOfYear.Format("2006-01-02")
 				timeTo = firstDayOfYear.AddDate(1, 0, 0).Format("2006-01-02")
-			
+
 			default:
-				return nil,fmt.Errorf("invalid budget period: %s", budget.Period)
+				return nil, fmt.Errorf("invalid budget period: %s", budget.Period)
 			}
-			
 
 			cursor, err := s.stg.Transaction().ListTransactions(&pb.TransactionFilter{
 				AccountId: currentTransaction.AccountId,
@@ -277,7 +279,7 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, req *pb.Tran
 				TimeTo:    timeTo,
 			})
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 
 			// Calculate the total spendings within the selected time range
@@ -299,155 +301,155 @@ func (s *TransactionService) UpdateTransaction(ctx context.Context, req *pb.Tran
 				// Marshal the notification into JSON
 				input, err := protojson.Marshal(&notification)
 				if err != nil {
-					return nil,err
+					return nil, err
 				}
 
 				// Produce the notification message to the Kafka topic
 				if err := s.producer.ProduceMessages("notification-create", input); err != nil {
-					return nil,err
+					return nil, err
 				}
 			}
 
 		}
-	} 
+	}
 
 	//update goal
 	filter := pb.GoalFilter{
 		UserId: currentTransaction.UserId,
 		Status: "ongoing",
 	}
-	goals,err := s.stg.Goal().ListGoals(&filter)
-	if err!= nil {
+	goals, err := s.stg.Goal().ListGoals(&filter)
+	if err != nil {
 		return nil, err
 	}
 	goal := goals.Goals[0]
 	if currentTransaction.Type == "debit" {
 		goalProgress := goal.CurrentAmount + difference
-        if goalProgress >= goal.TargetAmount {
-            message := fmt.Sprintf("Congratulations! You have reached your goal of $%v", goal.TargetAmount)
-            notification := pb.NotificationCreate{
-                RecieverId: currentTransaction.UserId,
-                Message:    message,
-            }
-            input, err := protojson.Marshal(&notification)
-            if err!= nil {
-                return nil, err
-            }
-            err = s.producer.ProduceMessages("notification-create", input)
-            if err!= nil {
-                return nil, err
-            }
-        }
-        _,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+		if goalProgress >= goal.TargetAmount {
+			message := fmt.Sprintf("Congratulations! You have reached your goal of $%v", goal.TargetAmount)
+			notification := pb.NotificationCreate{
+				RecieverId: currentTransaction.UserId,
+				Message:    message,
+			}
+			input, err := protojson.Marshal(&notification)
+			if err != nil {
+				return nil, err
+			}
+			err = s.producer.ProduceMessages("notification-create", input)
+			if err != nil {
+				return nil, err
+			}
+		}
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
 			Id:   goal.Id,
-            Body: &pb.GoalUpt{CurrentAmount: goalProgress},
+			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
 		})
-        if err!= nil {
-            return nil, err
-        }
-		
+		if err != nil {
+			return nil, err
+		}
+
 	} else {
 		goalProgress := goal.CurrentAmount - difference
-        _,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
-            Id:   goal.Id,
-            Body: &pb.GoalUpt{CurrentAmount: goalProgress},
-        })
-        if err!= nil {
-            return nil, err
-        }
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+			Id:   goal.Id,
+			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// send notification to kafka
-	message := fmt.Sprintf("A new amount %.2f has been %ved from your account with id: %v", difference, req.Body.Type,currentTransaction.AccountId)
+	message := fmt.Sprintf("A new amount %.2f has been %ved from your account with id: %v", difference, req.Body.Type, currentTransaction.AccountId)
 	notification := pb.NotificationCreate{
 		RecieverId: currentTransaction.UserId,
 		Message:    message,
 	}
 
 	input, err := protojson.Marshal(&notification)
-	if err!= nil {
+	if err != nil {
 		return nil, err
 	}
 
-	if err := s.producer.ProduceMessages("notification-create", input); err!= nil {
+	if err := s.producer.ProduceMessages("notification-create", input); err != nil {
 		return nil, err
 	}
-    
+
 	return s.stg.Transaction().UpdateTransaction(req)
 }
 
 func (s *TransactionService) DeleteTransaction(ctx context.Context, req *pb.ById) (*pb.Void, error) {
 	//get account id from transaction
 	transaction, err := s.stg.Transaction().GetTransaction(req)
-    if err!= nil {
-        return nil, err
-    }
-    account_id := pb.ById{Id: transaction.AccountId}
-    account, err := s.stg.Account().GetAccount(&account_id)
-    if err!= nil {
-        return nil, err
-    }
-    currentBalance := account.Balance
-    if transaction.Type == "credit" {
-        currentBalance += transaction.Amount
-    } else {
-        currentBalance -= transaction.Amount
-    }
+	if err != nil {
+		return nil, err
+	}
+	account_id := pb.ById{Id: transaction.AccountId}
+	account, err := s.stg.Account().GetAccount(&account_id)
+	if err != nil {
+		return nil, err
+	}
+	currentBalance := account.Balance
+	if transaction.Type == "credit" {
+		currentBalance += transaction.Amount
+	} else {
+		currentBalance -= transaction.Amount
+	}
 
-    //update the account balance
-    account_update := pb.AccountUpdate{
-        Id:   transaction.AccountId,
-        Body: &pb.AccountUpt{Balance: currentBalance},
-    }
-    _, err = s.stg.Account().UpdateAccount(&account_update)
-    if err!= nil {
-        return nil, err
+	//update the account balance
+	account_update := pb.AccountUpdate{
+		Id:   transaction.AccountId,
+		Body: &pb.AccountUpt{Balance: currentBalance},
+	}
+	_, err = s.stg.Account().UpdateAccount(&account_update)
+	if err != nil {
+		return nil, err
 	}
 	//update goal
 	filter := pb.GoalFilter{
 		UserId: transaction.UserId,
 		Status: "ongoing",
 	}
-	goals,err := s.stg.Goal().ListGoals(&filter)
-	if err!= nil {
+	goals, err := s.stg.Goal().ListGoals(&filter)
+	if err != nil {
 		return nil, err
 	}
 	goal := goals.Goals[0]
 	if transaction.Type == "debit" {
 		goalProgress := goal.CurrentAmount - transaction.Amount
 
-		_,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
 			Id:   goal.Id,
 			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
 		})
-		if err!= nil {
+		if err != nil {
 			return nil, err
 		}
-		
+
 	} else {
 		goalProgress := goal.CurrentAmount + transaction.Amount
-		_,err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
+		_, err = s.stg.Goal().UpdateGoal(&pb.GoalUpdate{
 			Id:   goal.Id,
 			Body: &pb.GoalUpt{CurrentAmount: goalProgress},
 		})
-		if err!= nil {
+		if err != nil {
 			return nil, err
 		}
 	}
 
 	// send notification to kafka
-	message := fmt.Sprintf("transaction with %v id has been deleted successfully",req.Id)
+	message := fmt.Sprintf("transaction with %v id has been deleted successfully", req.Id)
 	notification := pb.NotificationCreate{
 		RecieverId: transaction.UserId,
 		Message:    message,
 	}
 
 	input, err := protojson.Marshal(&notification)
-	if err!= nil {
+	if err != nil {
 		return nil, err
 	}
 
-	if err := s.producer.ProduceMessages("notification-create", input); err!= nil {
+	if err := s.producer.ProduceMessages("notification-create", input); err != nil {
 		return nil, err
 	}
 

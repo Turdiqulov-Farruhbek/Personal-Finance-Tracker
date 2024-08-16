@@ -1,4 +1,4 @@
-module gitlab.com/saladin2098/finance_tracker1/budget
+module finance_tracker/budget
 
 go 1.22.1
 

@@ -1,4 +1,4 @@
-module gitlab.com/saladin2098/finance_tracker1/auth_service
+module finance_tracker/auth_service
 
 go 1.22.1
 

@@ -1,8 +1,8 @@
 package handler
 
 import (
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/kafka"
+	pb "finance_tracker/auth_service/genproto"
+	"finance_tracker/auth_service/kafka"
 )
 
 type Handler struct {

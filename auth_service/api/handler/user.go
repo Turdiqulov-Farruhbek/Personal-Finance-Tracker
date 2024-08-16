@@ -3,9 +3,10 @@ package handler
 import (
 	"log"
 
+	pb "finance_tracker/auth_service/genproto"
+	token "finance_tracker/auth_service/token"
+
 	"github.com/gin-gonic/gin"
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	token "gitlab.com/saladin2098/finance_tracker1/auth_service/token"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

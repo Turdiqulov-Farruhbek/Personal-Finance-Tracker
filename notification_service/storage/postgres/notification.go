@@ -5,11 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
 
+	pb "finance_tracker/notification_service/genproto"
+	"finance_tracker/notification_service/helper"
+
 	"github.com/google/uuid"
-	pb "gitlab.com/saladin2098/finance_tracker1/notification_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/notification_service/helper"
 )
 
 type NotificationRepo struct {
@@ -23,14 +25,14 @@ func NewNotificationRepo(db *sql.DB, user_con pb.AuthServiceClient) *Notificatio
 func (r *NotificationRepo) CreateNotification(req *pb.NotificationCreate) (*pb.Void, error) {
 	var sender_id string
 	if req.SenderId == "" {
-		query := "select id from users where role = admin where deleted_at = 0 limit1"
+		query := "select id from users where role = 'admin' and deleted_at = 0 limit 1"
 		row := r.db.QueryRow(query)
 		err := row.Scan(&sender_id)
 		if err == sql.ErrNoRows {
-            return nil, errors.New("admin not found")
-        } else if err!= nil {
-            return nil, err
-        }
+			return nil, errors.New("admin not found")
+		} else if err != nil {
+			return nil, err
+		}
 	} else {
 		sender_id = req.SenderId
 	}
@@ -41,16 +43,16 @@ func (r *NotificationRepo) CreateNotification(req *pb.NotificationCreate) (*pb.V
 	}
 
 	//geting the email
-	var user_email,user_name string 
+	var user_email, user_name string
 	email_query := "select email,username from users where id = $1 and deleted_at = 0"
 	err = r.db.QueryRow(email_query, sender_id).Scan(&user_email, &user_name)
 	if err == sql.ErrNoRows {
-        return nil, errors.New("sender not found")
+		return nil, errors.New("sender not found")
 	}
 
 	//sending email
-	from := "shamsioqilov@gmail.com"
-	password := "rdpo ehng abtm fuzy"
+	from := "farruhbekturdiqulov@gmail.com"
+	password := "f0313y0513"
 	err = helper.SendVerificationCode(helper.Params{
 		From:     from,
 		Password: password,
@@ -89,14 +91,14 @@ func (r *NotificationRepo) CreateNotification(req *pb.NotificationCreate) (*pb.V
 }
 func (r *NotificationRepo) NotifyAll(req *pb.NotificationMessage) (*pb.Void, error) {
 	if req.SenderId == "" {
-		query := "select id from users where role = admin where deleted_at = 0 limit1"
+		query := "select id from users where role = 'admin' where deleted_at = 0 limit1"
 		row := r.db.QueryRow(query)
 		err := row.Scan(&req.SenderId)
 		if err == sql.ErrNoRows {
-            return nil, errors.New("admin not found")
-        } else if err!= nil {
-            return nil, err
-        }
+			return nil, errors.New("admin not found")
+		} else if err != nil {
+			return nil, err
+		}
 	}
 
 	fil := pb.Filter{}
@@ -108,7 +110,6 @@ func (r *NotificationRepo) NotifyAll(req *pb.NotificationMessage) (*pb.Void, err
 	if err != nil {
 		return nil, err
 	}
-	
 
 	for _, user := range users.Users {
 		sender_id := req.SenderId
@@ -119,8 +120,8 @@ func (r *NotificationRepo) NotifyAll(req *pb.NotificationMessage) (*pb.Void, err
 		}
 
 		//sending email
-		from := "shamsioqilov@gmail.com"
-		password := "rdpo ehng abtm fuzy"
+		from := "farruhbekturdiqulov@gmail.com"
+		password := "f0313y0513"
 		err = helper.SendVerificationCode(helper.Params{
 			From:     from,
 			Password: password,
@@ -202,6 +203,7 @@ func (r *NotificationRepo) UpdateNotificcation(req *pb.NotificationUpdate) (*pb.
 }
 func (r *NotificationRepo) GetNotifications(req *pb.NotifFilter) (*pb.NotificationList, error) {
 
+	log.Println("----------------------------", req.RecieverId)
 	query := `SELECT id, 
 					reciever_id, 
 					message, 
@@ -216,16 +218,16 @@ func (r *NotificationRepo) GetNotifications(req *pb.NotifFilter) (*pb.Notificati
 	// Dynamically build the query
 	if req.RecieverId != "" && req.RecieverId != "string" {
 		cons = append(cons, fmt.Sprintf("reciever_id = $%d", len(args)+1))
-		args = append(args, "%"+req.RecieverId+"%")
+		args = append(args, req.RecieverId)
 	}
 
 	if req.Status != "" && req.Status != "string" {
 		cons = append(cons, fmt.Sprintf("status = $%d", len(args)+1))
-		args = append(args, "%"+req.Status+"%")
+		args = append(args, req.Status)
 	}
 	if req.SenderId != "" && req.SenderId != "string" {
 		cons = append(cons, fmt.Sprintf("sender_id = $%d", len(args)+1))
-		args = append(args, "%"+req.SenderId+"%")
+		args = append(args, req.SenderId)
 	}
 
 	// Append conditions to query if any exist
@@ -233,8 +235,16 @@ func (r *NotificationRepo) GetNotifications(req *pb.NotifFilter) (*pb.Notificati
 		query += " AND " + strings.Join(cons, " AND ")
 	}
 
-	query += fmt.Sprintf(" LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
-	args = append(args, req.Filter.Limit, req.Filter.Offset)
+	if req.Filter.Limit != 0 || req.Filter.Offset != 0 {
+		if req.Filter.Limit != 0 {
+			query += fmt.Sprintf("LIMIT $%d", len(args)+1)
+			args = append(args, req.Filter.Limit)
+		}
+		if req.Filter.Offset != 0 {
+			query += fmt.Sprintf(" OFFSET $%d", len(args)+1)
+			args = append(args, req.Filter.Offset)
+		}
+	}
 
 	// Execute the query
 	rows, err := r.db.Query(query, args...)
@@ -262,7 +272,7 @@ func (r *NotificationRepo) GetNotifications(req *pb.NotifFilter) (*pb.Notificati
 		return nil, fmt.Errorf("error with rows: %w", err)
 	}
 	for _, n := range notificationList.Notifications {
-		query := `update notifications set status = read 
+		query := `update notifications set status = 'read' 
 					where deleted_at = 0 and id = $1`
 		_, err := r.db.Exec(query, n.Id)
 		if err != nil {

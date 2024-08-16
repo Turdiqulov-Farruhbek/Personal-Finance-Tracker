@@ -12,9 +12,9 @@ import (
 	redis "github.com/go-redis/redis"
 	"github.com/google/uuid"
 
-	pb "gitlab.com/saladin2098/finance_tracker1/auth_service/genproto"
-	"gitlab.com/saladin2098/finance_tracker1/auth_service/helper"
-	t "gitlab.com/saladin2098/finance_tracker1/auth_service/token"
+	pb "finance_tracker/auth_service/genproto"
+	"finance_tracker/auth_service/helper"
+	t "finance_tracker/auth_service/token"
 )
 
 type UserRepo struct {
@@ -70,7 +70,6 @@ func (ur *UserRepo) RegisterUser(req *pb.UserCreateReq) (*pb.Void, error) {
 
 	return &pb.Void{}, nil
 }
-
 
 func (r *UserRepo) Login(req *pb.LoginReq) (*pb.Token, error) {
 	query := `select id, username, role from users where username=$1 and password=$2 and confirmed = true`
