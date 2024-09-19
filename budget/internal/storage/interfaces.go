@@ -25,6 +25,7 @@ type BudgetI interface {
 	GetBudget(req *pb.ById) (*pb.BudgetGet, error)
 	ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error)
 }
+
 type CategoryI interface {
 	CreateCategory(req *pb.CategoryCreate) (*pb.Void, error)
 	UpdateCategory(req *pb.CategoryUpdate) (*pb.Void, error)
@@ -32,6 +33,7 @@ type CategoryI interface {
 	GetCategory(req *pb.ById) (*pb.CategoryGet, error)
 	ListCategories(req *pb.CategoryFilter) (*pb.CategoryList, error)
 }
+
 type TransactionI interface {
 	CreateTransaction(req *pb.TransactionCreate) (*pb.Void, error)
 	UpdateTransaction(req *pb.TransactionUpdate) (*pb.Void, error)
@@ -39,6 +41,7 @@ type TransactionI interface {
 	GetTransaction(req *pb.ById) (*pb.TransactionGet, error)
 	ListTransactions(req *pb.TransactionFilter) (*pb.TransactionList, error)
 }
+
 type GoalI interface {
 	CreateGoal(req *pb.GoalCreate) (*pb.Void, error)
 	UpdateGoal(req *pb.GoalUpdate) (*pb.Void, error)
