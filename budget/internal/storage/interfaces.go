@@ -2,6 +2,7 @@ package storage
 
 import pb "finance_tracker/budget/internal/pkg/genproto"
 
+
 type StorageI interface {
 	Account() AccountI
 	Budget() BudgetI
