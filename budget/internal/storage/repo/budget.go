@@ -43,6 +43,7 @@ func (r *BudgetRepo) CreateBudget(req *pb.BudgetCreate) (*pb.Void, error) {
 
 	return &pb.Void{}, nil
 }
+
 func (r *BudgetRepo) UpdateBudget(req *pb.BudgetUpdate) (*pb.Void, error) {
 	obj_id, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
@@ -96,6 +97,7 @@ func (r *BudgetRepo) DeleteBudget(req *pb.ById) (*pb.Void, error) {
 
 	return &pb.Void{}, nil
 }
+
 func (r *BudgetRepo) GetBudget(req *pb.ById) (*pb.BudgetGet, error) {
 	var budget pb.BudgetGet
 	obj_id, err := primitive.ObjectIDFromHex(req.Id)
@@ -133,6 +135,7 @@ func (r *BudgetRepo) GetBudget(req *pb.ById) (*pb.BudgetGet, error) {
 
 	return &budget, nil
 }
+
 func (r *BudgetRepo) ListBudgets(req *pb.BudgetFilter) (*pb.BudgetList, error) {
 	filter := bson.M{"deleted_at": 0}
 	log.Println("ListBudgets user id ", req.UserId)
